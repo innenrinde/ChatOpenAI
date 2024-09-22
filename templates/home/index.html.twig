@@ -1,0 +1,178 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+<style>
+    html, body {
+        font: 14px/1.5 sans-serif;
+        margin: 0;
+        height: 100%;
+    }
+
+    .template {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        width: 100%;
+    }
+
+    /* chat section */
+    .container {
+        height: 100%;
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+    }
+    .title {
+        margin: 5px;
+        background-color: #e0e0e0;
+        padding: 5px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .chat {
+        margin: 5px;
+        border: solid 1px green;
+        height: 100%;
+        overflow-y: auto;
+    }
+    .chat .message {
+        padding: 5px;
+        margin: 5px;
+    }
+
+    .rolechat {
+        background-color: #e0e0e0;
+    }
+
+    .loading {
+        background-color: yellow;
+    }
+
+    .send-message {
+        margin: 5px 5px 25px 5px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .send-message input {
+        padding: 10px;
+    }
+
+    .send-message input[type=text] {
+        width: 100%;
+        background-color: antiquewhite;
+        border: solid 1px black;
+    }
+
+    .send-message input[type=submit] {
+        margin-left: 5px;
+        background-color: green;
+        color: white;
+        border: solid 1px black;
+    }
+
+    /*settings section*/
+    .settings {
+        height: 100%;
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .settings form {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .settings form .send-message {
+        text-align: center;
+    }
+
+    .text {
+        margin: 5px;
+        padding: 10px;
+        border: solid 1px green;
+        height: 100%;
+        overflow-y: auto;
+        color: gray;
+    }
+</style>
+
+<div class="template">
+    <div class="container">
+        <div class="title">OpenAI Chat</div>
+
+        <div class="chat" id="chatList">
+            {% for message in messages %}
+                <div class="message role{{ message.role }}">
+                {{ message.text|nl2br }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="send-message">
+            <form method="post" action="{{ path('app_send') }}" id="chatForm" onsubmit="return false">
+                <input
+                    type="text"
+                    name="message"
+                    id="message"
+                    onkeypress="clickPress(event)"
+                    placeholder="Scrie mesajul tau aici si apasa ENTER..."
+                    autocomplete="off"
+                />
+                <input
+                    type="submit"
+                    value="Trimite"
+                    onclick="formSubmit()"
+                />
+            </form>
+        </div>
+    </div>
+    <div class="settings">
+        <form method="post" action="{{ path('app_save') }}">
+            <div class="title">Settings - textul pentru antrenament</div>
+            <textarea
+                class="text"
+                name="settings"
+                >{{ settings }}</textarea>
+            <div class="send-message">
+                <input
+                    type="submit"
+                    value="Salveaza"
+                />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+	// document.addEventListener("DOMContentLoaded", () => {
+		function divOnBottom() {
+			var objDiv = document.getElementById("chatList");
+			objDiv.scrollTop = objDiv.scrollHeight;
+        }
+
+        function clickPress(event) {
+			if (event.keyCode === 13) {
+				document.getElementById("chatList").innerHTML += "<div class='message loading'>Așteaptă răspunsul de la server...</div>";
+				divOnBottom();
+                formSubmit();
+				document.getElementById("message").value = "";
+			}
+        }
+
+		function formSubmit() {
+			if (document.getElementById("message").value.trim()) {
+				document.getElementById("chatForm").submit();
+			}
+        }
+
+	    divOnBottom();
+	// });
+</script>
+{% endblock %}
